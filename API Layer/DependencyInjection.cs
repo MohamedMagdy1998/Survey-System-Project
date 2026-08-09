@@ -1,4 +1,5 @@
-﻿using Application.Services_Implementations;
+﻿using Application.Options;
+using Application.Services_Implementations;
 using Application.Services_Interfaces;
 using Domain.Common.Interfaces;
 using Domain.Contracts;
@@ -23,26 +24,38 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDependencies(this IServiceCollection  services,IConfiguration configuration)
     {
+        #region Configurations
+
         services.AddMapsterConfigurations();
         services.AddFluentValidationConfigurations();
         services.AddSwaggerServices();
         services.AddResponseCompressionConfigurations();
         services.AddEntityFrameworkConfiguration(configuration);
-        services.AddAuthenticationConfigurations();
+        services.AddAuthenticationConfigurations(configuration);
+        services.AddOptionsPatternConfigurations(configuration);
+        #endregion
 
-
+        #region Services Registeration
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPollService, PollService>();
+        #endregion
+
 
         return services;
     }
 
-    private static IServiceCollection AddAuthenticationConfigurations(this IServiceCollection services)
+
+    #region Configuration Methods
+
+    private static IServiceCollection AddAuthenticationConfigurations(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>()
              .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+        var JwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
         services.AddAuthentication(options =>
         {
@@ -54,25 +67,30 @@ public static class DependencyInjection
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                   
+
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "SurveySystem",
-                    ValidAudience = "SurveySystem Users",
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjAcB")) // Replace with your secret key
-                }; 
+                    ValidIssuer = JwtSettings!.Issuer,
+                    ValidAudience = JwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(JwtSettings.Key)) 
+                };
             });
 
 
         return services;
 
     }
-    
-      
-
-    private static IServiceCollection AddEntityFrameworkConfiguration(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddOptionsPatternConfigurations(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        return services;
+    }
+    private static IServiceCollection AddEntityFrameworkConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
         {
@@ -80,7 +98,7 @@ public static class DependencyInjection
 
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
         });
-           
+
 
         return services;
     }
@@ -113,30 +131,33 @@ public static class DependencyInjection
 
     private static IServiceCollection AddResponseCompressionConfigurations(this IServiceCollection services)
     {
-       
+
         services.AddResponseCompression(options =>
         {
-           
+
             options.Providers.Add<BrotliCompressionProvider>();
             options.Providers.Add<GzipCompressionProvider>();
-           
+
             options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
            new[] { "application/json", "text/plain", "image/svg+xml" });
-            
+
             options.EnableForHttps = false;
         });
-        
+
         services.Configure<BrotliCompressionProviderOptions>(options =>
         {
-            
+
             options.Level = CompressionLevel.Optimal;
         });
-       
-       services.Configure<GzipCompressionProviderOptions>(options =>
+
+        services.Configure<GzipCompressionProviderOptions>(options =>
         {
             options.Level = CompressionLevel.Fastest;
         });
         return services;
     }
+
+    #endregion
+
 
 }

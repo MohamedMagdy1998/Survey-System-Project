@@ -1,5 +1,7 @@
-﻿using Domain.Common.Interfaces;
+﻿using Application.Options;
+using Domain.Common.Interfaces;
 using Domain.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,9 +15,15 @@ namespace Infrastructure_Layer.Implementations;
 
 public class JwtProvider : IJwtProvider
 {
+    private readonly JwtOptions _options;
+
+    public JwtProvider(IOptions<JwtOptions> options)
+    {
+        _options = options.Value;
+    }
     public (string Token, int ExpiresIn) GenerateToken(ApplicationUser user)
     {
-        Claim[] claims = new Claim[]
+        Claim[] claims = new []
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
@@ -25,7 +33,7 @@ public class JwtProvider : IJwtProvider
 
         };
 
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjAcB")); // Replace with
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
     
         var signingCredentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
 
@@ -34,10 +42,10 @@ public class JwtProvider : IJwtProvider
         var expiresIn = 30;
 
         var token = new JwtSecurityToken(
-            issuer: "SurveySystem", 
-            audience: "SurveySystem Users",
+            issuer: _options.Issuer, 
+            audience: _options.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expiresIn),
+            expires: DateTime.UtcNow.AddMinutes(_options.ExpiryInMinutes),
             signingCredentials: signingCredentials
         );
 
