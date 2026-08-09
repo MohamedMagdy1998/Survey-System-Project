@@ -1,14 +1,19 @@
 ﻿using Application.Services_Implementations;
 using Application.Services_Interfaces;
+using Domain.Common.Interfaces;
 using Domain.Contracts;
+using Domain.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure_Layer;
 using Infrastructure_Layer.Implementations;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
 using System.Reflection;
 
@@ -23,15 +28,49 @@ public static class DependencyInjection
         services.AddSwaggerServices();
         services.AddResponseCompressionConfigurations();
         services.AddEntityFrameworkConfiguration(configuration);
+        services.AddAuthenticationConfigurations();
 
 
-
-
+        services.AddSingleton<IJwtProvider, JwtProvider>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPollService, PollService>();
 
         return services;
     }
+
+    private static IServiceCollection AddAuthenticationConfigurations(this IServiceCollection services)
+    {
+        services.AddIdentity<ApplicationUser, IdentityRole>()
+             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                   
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "SurveySystem",
+                    ValidAudience = "SurveySystem Users",
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjAcB")) // Replace with your secret key
+                }; 
+            });
+
+
+        return services;
+
+    }
+    
+      
 
     private static IServiceCollection AddEntityFrameworkConfiguration(this IServiceCollection services,IConfiguration configuration)
     {
