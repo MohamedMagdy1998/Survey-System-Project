@@ -1,8 +1,14 @@
-﻿using FluentValidation;
+﻿using Application.Services_Implementations;
+using Application.Services_Interfaces;
+using Domain.Contracts;
+using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure_Layer;
+using Infrastructure_Layer.Implementations;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
 using System.Reflection;
 
@@ -10,12 +16,32 @@ namespace API_Layer;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDependencies(this IServiceCollection  services)
+    public static IServiceCollection AddDependencies(this IServiceCollection  services,IConfiguration configuration)
     {
         services.AddMapsterConfigurations();
         services.AddFluentValidationConfigurations();
         services.AddSwaggerServices();
         services.AddResponseCompressionConfigurations();
+        services.AddEntityFrameworkConfiguration(configuration);
+
+
+
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPollService, PollService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddEntityFrameworkConfiguration(this IServiceCollection services,IConfiguration configuration)
+    {
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ??
+
+            throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
+        });
+           
 
         return services;
     }

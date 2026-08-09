@@ -11,7 +11,7 @@ public class Program
 
         builder.Services.AddControllers();
        
-        builder.Services.AddDependencies();
+        builder.Services.AddDependencies(builder.Configuration);
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
