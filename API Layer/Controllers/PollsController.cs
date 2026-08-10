@@ -1,5 +1,7 @@
 ﻿using Application.DTOs.Requests.Polls;
+using Application.DTOs.Responses.Polls;
 using Application.Services_Interfaces;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +33,7 @@ public class PollsController(IPollService pollService) : ControllerBase
     public async Task<IActionResult> Add([FromBody] PollRequest request,CancellationToken cancellationToken)
     {
         var newPoll = await _pollService.AddAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(Get), new { id = newPoll.Id }, newPoll);
+        return CreatedAtAction(nameof(Get), new { id = newPoll.Id }, newPoll.Adapt<PollResponse>());
     }
 
     [HttpPut("{id:int}")]
