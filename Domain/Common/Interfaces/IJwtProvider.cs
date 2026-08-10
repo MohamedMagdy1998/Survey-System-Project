@@ -10,4 +10,6 @@ namespace Domain.Common.Interfaces;
 public interface IJwtProvider
 {
     public (string Token,int ExpiresIn) GenerateToken(ApplicationUser user);
+
+    public string? ValidateToken(string token);
 }

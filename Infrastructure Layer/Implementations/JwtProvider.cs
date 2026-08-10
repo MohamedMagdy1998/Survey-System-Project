@@ -55,4 +55,35 @@ public class JwtProvider : IJwtProvider
 
 
     }
+
+    public string? ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var symmetricSecurityKey = new
+       SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+        try
+        {
+            tokenHandler.ValidateToken(token, new
+           TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = symmetricSecurityKey,
+
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero // don't add extra time to the token's expiration
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            var userId = jwtToken.Claims.First(x => x.Type ==
+           JwtRegisteredClaimNames.Sub).Value;
+            return userId;
+        }
+        catch
+        {
+            return null;
+        }
+
+    }
+
 }
