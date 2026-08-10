@@ -25,6 +25,8 @@ public class Program
         app.UseHsts();
 
         app.UseHttpsRedirection();
+
+        app.UseCors();
     
         app.UseRouting();
 

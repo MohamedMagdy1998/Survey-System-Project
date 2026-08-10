@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddEntityFrameworkConfiguration(configuration);
         services.AddAuthenticationConfigurations(configuration);
         services.AddOptionsPatternConfigurations(configuration);
+        services.AddCorsConfigurations(configuration);
         #endregion
 
         #region Services Registeration
@@ -154,6 +155,19 @@ public static class DependencyInjection
         {
             options.Level = CompressionLevel.Fastest;
         });
+        return services;
+    }
+
+    private static IServiceCollection AddCorsConfigurations(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddCors(options =>
+            options.AddDefaultPolicy(builder =>
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+            )
+        );
         return services;
     }
 
