@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Requests.Polls;
 using Application.DTOs.Responses.Polls;
+using Domain.Common.Abstractions;
 using Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace Application.Services_Interfaces;
 
 public interface IPollService
 {
-    Task<IEnumerable<PollResponse>> GetAllAsync(CancellationToken cancellationToken = default);
-    Task<PollResponse?> GetAsync(int id, CancellationToken cancellationToken = default);
-    Task<PollResponse> AddAsync(PollRequest request, CancellationToken cancellationToken = default);
-    Task<bool> UpdateAsync(int id, PollRequest request, CancellationToken cancellationToken = default);
-    Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
-    Task<bool> TogglePublishStatusAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<IEnumerable<PollResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Result<PollResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<PollResponse>> AddAsync(PollRequest request, CancellationToken cancellationToken = default);
+    Task<Result> UpdateAsync(int id, PollRequest request, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result> TogglePublishStatusAsync(int id, CancellationToken cancellationToken = default);
 }

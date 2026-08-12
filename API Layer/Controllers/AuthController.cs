@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Requests.Authorization;
+﻿using API_Layer.Extentions;
+using Application.DTOs.Requests.Authorization;
 using Application.Services_Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,6 @@ namespace API_Layer.Controllers;
 
 [Route("/[controller]")]
 [ApiController]
-[Authorize]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
     {
         var authResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
 
-        return authResult is null ? BadRequest("Invalid email/password") : Ok(authResult);
+        return authResult.IsSuccess ? Ok(authResult.Value) : authResult.Problem();
 
     }
 
@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
     {
         var authResult = await _authService.GetNewTokenAndRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-        return authResult is null ? BadRequest("Invalid token") : Ok(authResult);
+        return authResult.IsSuccess ? Ok(authResult.Value) : authResult.Problem();
     }
 
     [HttpPost("revoke-refresh-token")]
@@ -42,7 +42,7 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-        return result ? Ok() : BadRequest("Operation failed");
+        return result.IsSuccess ? Ok() : result.Problem();
     }
 }   
 

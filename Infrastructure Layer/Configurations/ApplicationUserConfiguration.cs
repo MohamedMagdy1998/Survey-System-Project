@@ -23,6 +23,12 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         {
             rt.ToTable("RefreshTokens");
             rt.WithOwner().HasForeignKey("UserId");
+
+            rt.Property(r => r.ExpiresOn)
+                .HasColumnName("Expireson"); 
+
+            rt.Property(r => r.RevokedOn)
+                .HasColumnName("RevokedOn");
         });
     }
 }
