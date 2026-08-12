@@ -1,4 +1,5 @@
-﻿using Application.Options;
+﻿using API_Layer.Middleware;
+using Application.Options;
 using Application.Services_Implementations;
 using Application.Services_Interfaces;
 using Domain.Common.Interfaces;
@@ -41,6 +42,9 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPollService, PollService>();
+
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
         #endregion
 
 

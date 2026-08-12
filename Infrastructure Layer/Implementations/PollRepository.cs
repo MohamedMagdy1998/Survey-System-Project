@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,4 +40,9 @@ public class PollRepository(ApplicationDbContext context) : IPollRepository
         _context.Polls.Remove(poll);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+
+    public async Task<bool> ExistsAsync(Expression<Func<Poll, bool>> predicate, CancellationToken cancellationToken = default) =>
+        await _context.Polls.AnyAsync(predicate, cancellationToken);
+
 }

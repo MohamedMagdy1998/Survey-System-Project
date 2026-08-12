@@ -10,7 +10,7 @@ namespace Infrastructure_Layer.Implementations;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _context;
+    public readonly ApplicationDbContext _context;
 
     private readonly Lazy<IPollRepository> _PollRepository;
 

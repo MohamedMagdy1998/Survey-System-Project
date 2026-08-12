@@ -44,6 +44,11 @@ public class PollService(IUnitOfWork unitOfWork) : IPollService
 
     public async Task<Result<PollResponse>> AddAsync(PollRequest request, CancellationToken cancellationToken = default)
     {
+        var existingPoll = await _unitOfWork.Polls.ExistsAsync(x => x.Title == request.Title, cancellationToken);
+        
+        if (existingPoll)
+            return (PollErrors.DuplicateTitle);
+
         var poll = request.Adapt<Poll>();
 
         await _unitOfWork.Polls.AddAsync(poll, cancellationToken);
@@ -57,8 +62,15 @@ public class PollService(IUnitOfWork unitOfWork) : IPollService
     public async Task<Result> UpdateAsync(int id, PollRequest request, CancellationToken cancellationToken = default)
     {
         var currentPoll = await _unitOfWork.Polls.GetAsync(id, cancellationToken);
+       
         if (currentPoll is null)
             return (PollErrors.NotFound);
+
+        var existingPoll = await _unitOfWork.Polls.ExistsAsync(x => x.Title == request.Title && x.Id != id, cancellationToken);
+
+        if (existingPoll)
+            return (PollErrors.DuplicateTitle);
+
 
         //currentPoll.Title = request.Title;
         //currentPoll.Summary = request.Summary;
