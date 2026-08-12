@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,4 +15,5 @@ public interface IPollRepository
     Task<Poll> AddAsync(Poll poll, CancellationToken cancellationToken = default);
     Task UpdateAsync(Poll poll, CancellationToken cancellationToken = default);
     Task DeleteAsync(Poll poll, CancellationToken cancellationToken = default);
+    Task<bool> ExistsAsync(Expression<Func<Poll, bool>> predicate, CancellationToken cancellationToken = default);
 }
