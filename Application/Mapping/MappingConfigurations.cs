@@ -1,4 +1,6 @@
-﻿using Mapster;
+﻿using Application.DTOs.Requests.Questions;
+using Domain.Models;
+using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ public class MappingConfigurations : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        throw new NotImplementedException();
+        config.NewConfig<QuestionRequest, Question>()
+           .Ignore(dest => dest.Answers);
     }
 }

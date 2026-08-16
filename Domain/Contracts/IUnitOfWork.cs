@@ -9,6 +9,7 @@ namespace Domain.Contracts;
 public interface IUnitOfWork : IDisposable
 {
     IPollRepository Polls { get; }
+    IQuestionRespository Questions { get; }
 
     Task<int> CompleteAsync(CancellationToken cancellationToken = default);
 }

@@ -14,17 +14,24 @@ public class UnitOfWork : IUnitOfWork
 
     private readonly Lazy<IPollRepository> _PollRepository;
 
+    private readonly Lazy<IQuestionRespository> _QuestionRepository;
+
+
     public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
         _PollRepository = new Lazy<IPollRepository>(() => new PollRepository(_context));
+        _QuestionRepository = new Lazy<IQuestionRespository>(() => new QuestionRepository(_context));
+
     }
 
     public IPollRepository Polls => _PollRepository.Value;
 
+
+    public IQuestionRespository Questions => _QuestionRepository.Value;
+
     public async Task<int> CompleteAsync(CancellationToken cancellationToken = default) =>
         await _context.SaveChangesAsync(cancellationToken);
 
-    public void Dispose() =>
-        _context.Dispose();
+    public void Dispose() => _context.Dispose();
 }

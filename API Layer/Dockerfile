@@ -9,6 +9,11 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+# Run the app listening on port 8080 by default and indicate we're running in a container.
+ENV ASPNETCORE_URLS="http://+:8080" \
+	DOTNET_RUNNING_IN_CONTAINER=true \
+	ASPNETCORE_ENVIRONMENT=Production
+
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build

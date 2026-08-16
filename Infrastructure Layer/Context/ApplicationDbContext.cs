@@ -18,6 +18,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Poll> Polls { get; set; }
 
+    public DbSet<Question> Questions { get; set; }
+
+    public DbSet<Answer> Answers { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
@@ -28,6 +32,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        var CascadeFKs = modelBuilder.Model.GetEntityTypes()
+            .SelectMany(t => t.GetForeignKeys())
+            .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
+
+        foreach (var foreignKey in CascadeFKs)
+        {
+            foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+        }
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }

@@ -2,8 +2,10 @@
 using Application.Options;
 using Application.Services_Implementations;
 using Application.Services_Interfaces;
+using Domain;
 using Domain.Common.Interfaces;
 using Domain.Contracts;
+using Domain.Contracts.Repositories;
 using Domain.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -39,9 +41,12 @@ public static class DependencyInjection
 
         #region Services Registeration
         services.AddSingleton<IJwtProvider, JwtProvider>();
+        services.AddScoped<IPollRepository, PollRepository>();
+        services.AddScoped<IQuestionRespository, QuestionRepository>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPollService, PollService>();
+        services.AddScoped<IQuestionService, QuestionService>();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
