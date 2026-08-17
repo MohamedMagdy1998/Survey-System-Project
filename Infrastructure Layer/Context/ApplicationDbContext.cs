@@ -22,6 +22,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Answer> Answers { get; set; }
 
+    public DbSet<Vote> Votes { get; set; }
+
+    public DbSet<VoteAnswer> VoteAnswers { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
@@ -70,6 +74,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         return base.SaveChangesAsync(cancellationToken);
     }
+
 
 
 }

@@ -11,5 +11,7 @@ public interface IUnitOfWork : IDisposable
     IPollRepository Polls { get; }
     IQuestionRespository Questions { get; }
 
+    IVoteRepository Votes { get; }
+
     Task<int> CompleteAsync(CancellationToken cancellationToken = default);
 }

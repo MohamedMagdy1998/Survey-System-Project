@@ -31,6 +31,20 @@ public class PollService(IUnitOfWork unitOfWork) : IPollService
         return Result.Success(pollresponse);
     }
 
+    public async Task<Result<IEnumerable<PollResponse>>> GetCurrentAsync(CancellationToken cancellationToken = default)
+    {
+        var polls = await _unitOfWork.Polls.GetCurrentAsync(cancellationToken);
+
+        if (polls is null)
+            return (PollErrors.NotFound);
+
+        var pollresponse = polls.Adapt<IEnumerable<PollResponse>>();
+
+
+        return Result.Success(pollresponse);
+
+    }
+
     public async Task<Result<PollResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
     {
         var poll = await _unitOfWork.Polls.GetAsync(id, cancellationToken);

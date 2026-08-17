@@ -72,6 +72,49 @@ public class QuestionService : IQuestionService
     }
 
 
+    public async Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int PollId, string UserId, CancellationToken cancellationToken = default)
+    {
+        var pollExists = await UnitOfWork.Polls.ExistsAsync(x => x.Id == PollId
+                            &&x.IsPublished == true&&
+                            x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow)
+                                        && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow)
+                            , cancellationToken);
+
+        if (!pollExists)
+            return PollErrors.NotFound;
+
+        
+
+        var questions = await UnitOfWork.Questions.GetAvailableAsync(PollId, UserId, cancellationToken);
+        
+        
+        if (!questions.Any())
+            return QuestionErrors.NotFound;
+
+        var questionWithSpecificAnswers =  questions.Select(q => new QuestionResponse
+                              (
+                                  q.Id,
+                                  q.Content,
+                                  q.Answers.Where(a => a.IsActive)
+                                  .Select(a => new Application.DTOs.Responses.Answers.AnswerResponse(a.Id, a.Content))
+
+                              ));
+
+        if (!questions.Any())
+            return QuestionErrors.NotFound;
+
+        var hasVoted = await UnitOfWork.Votes.ExistsAsync(PollId, UserId, cancellationToken);
+
+        if (hasVoted)
+            return VoteErrors.DuplicateContent;
+
+
+        var response = questions.Adapt<IEnumerable<QuestionResponse>>();
+        return Result.Success(response);
+    }
+
+
+
     public async Task<Result<QuestionResponse>> GetByIdAsync(int PollId, int Id, CancellationToken cancellationToken=default)
     {
         var question = await UnitOfWork.Questions.GetAsync(PollId, Id, cancellationToken);

@@ -19,6 +19,16 @@ public class PollRepository(ApplicationDbContext context) : IPollRepository
     public async Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken = default) =>
         await _context.Polls.AsNoTracking().ToListAsync(cancellationToken);
 
+    public async Task<IEnumerable<Poll>> GetCurrentAsync(CancellationToken cancellationToken = default)
+    {
+       return await _context.Polls
+                    .Where(x=>x.IsPublished
+                    && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow)
+                    && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+    }
+
     public async Task<Poll?> GetAsync(int id, CancellationToken cancellationToken = default) =>
         await _context.Polls.FindAsync(id, cancellationToken);
 

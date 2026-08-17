@@ -16,18 +16,22 @@ public class UnitOfWork : IUnitOfWork
 
     private readonly Lazy<IQuestionRespository> _QuestionRepository;
 
+    private readonly Lazy<IVoteRepository> _VoteRepository;
+
+
 
     public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
         _PollRepository = new Lazy<IPollRepository>(() => new PollRepository(_context));
         _QuestionRepository = new Lazy<IQuestionRespository>(() => new QuestionRepository(_context));
+        _VoteRepository = new Lazy<IVoteRepository>(() => new VoteRepository(_context));
 
     }
 
     public IPollRepository Polls => _PollRepository.Value;
 
-
+    public IVoteRepository Votes => _VoteRepository.Value;
     public IQuestionRespository Questions => _QuestionRepository.Value;
 
     public async Task<int> CompleteAsync(CancellationToken cancellationToken = default) =>

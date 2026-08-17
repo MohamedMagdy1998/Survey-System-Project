@@ -1,4 +1,5 @@
-﻿using Domain.Common.Abstractions;
+﻿using Application.DTOs.Responses.Questions;
+using Domain.Common.Abstractions;
 using Domain.Common.Abstractions.Errors;
 using Domain.Contracts;
 using Domain.Models;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Application.DTOs.Responses;
 
 namespace Infrastructure_Layer.Implementations;
 
@@ -34,6 +36,22 @@ public class QuestionRepository : IQuestionRespository
 
     public async Task<IEnumerable<Question>> GetAllAsync(int pollId, CancellationToken cancellationToken = default) =>
         await Context.Questions.Where(q => q.PollId == pollId).Include(q => q.Answers).AsNoTracking().ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<Question>> GetAvailableAsync(int pollId, string userId, CancellationToken cancellationToken = default)
+    {
+        return await Context.Questions
+                    .Where(q => q.PollId == pollId && q.IsActive)
+                   .AsNoTracking().ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<int>> GetActiveQuestionIdsAsync(int pollId, CancellationToken cancellationToken = default)
+    {
+        return await Context.Questions
+            .Where(q => q.PollId == pollId && q.IsActive)
+            .Select(q => q.Id)
+            .ToListAsync(cancellationToken);
+    }
+
 
     public async Task<Question?> GetAsync(int pollId, int id, CancellationToken cancellationToken = default)
     {

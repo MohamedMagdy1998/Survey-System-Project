@@ -43,10 +43,13 @@ public static class DependencyInjection
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IPollRepository, PollRepository>();
         services.AddScoped<IQuestionRespository, QuestionRepository>();
+        services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IVoteService, VoteService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();

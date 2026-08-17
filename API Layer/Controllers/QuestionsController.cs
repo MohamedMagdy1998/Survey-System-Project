@@ -30,7 +30,6 @@ public class QuestionsController : ControllerBase
                    return result.Problem();
 
                                 return Ok(result.Value);
-       
     }
 
 
