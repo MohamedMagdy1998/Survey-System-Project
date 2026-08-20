@@ -9,13 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class PollsController(IPollService pollService) : ControllerBase
+public class PollsController(IPollService pollService, ILogger<PollsController> logger) : ControllerBase
 {
     private readonly IPollService _pollService = pollService;
+    private readonly ILogger<PollsController> _logger = logger;
 
     [HttpGet("")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Getting all polls");
         var response = await _pollService.GetAllAsync(cancellationToken);
 
         return response.IsSuccess ? Ok(response.Value) : response.Problem();    
@@ -24,6 +26,7 @@ public class PollsController(IPollService pollService) : ControllerBase
     [HttpGet("current")]
     public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
+     
         var response = await _pollService.GetCurrentAsync(cancellationToken);
 
         return response.IsSuccess ? Ok(response.Value) : response.Problem();
