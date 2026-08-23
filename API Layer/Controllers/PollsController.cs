@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class PollsController(IPollService pollService, ILogger<PollsController> logger) : ControllerBase
 {
     private readonly IPollService _pollService = pollService;

@@ -28,7 +28,7 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection  services,IConfiguration configuration)
     {
         #region Configurations
-
+        services.AddDistributedMemoryCache();
         services.AddMapsterConfigurations();
         services.AddFluentValidationConfigurations();
         services.AddSwaggerServices();
@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IResultService, ResultService>();
         services.AddScoped<IVoteService, VoteService>();
+        services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
 
