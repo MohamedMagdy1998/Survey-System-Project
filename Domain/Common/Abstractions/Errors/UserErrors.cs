@@ -16,6 +16,9 @@ public static class UserErrors
     public static readonly Error InvalidCredentials =
         Error.BadRequest("Users.InvalidCredentials", "Invalid email or password.");
 
+    public static readonly Error InvalidCode =
+        Error.BadRequest("Users.InvalidCode", "Invalid Code.");
+
     // HTTP 409
     public static readonly Error DuplicateEmail =
         Error.Conflict("Users.DuplicateEmail", "A user with this email address already exists.");
@@ -35,4 +38,9 @@ public static class UserErrors
     // HTTP 400
     public static readonly Error EmailNotConfirmed =
         Error.BadRequest("Users.EmailNotConfirmed", "Email address has not been confirmed yet.");
+
+    public static readonly Error DuplicatedConfirmation =
+       Error.Conflict("Users.DuplicatedConfirmation", "A user Confirmed Already.");
+
+
 }

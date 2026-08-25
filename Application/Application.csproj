@@ -10,14 +10,27 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="Templates\**\*.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Mapster.DependencyInjection" Version="10.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.29" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\EmailConfirmation.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

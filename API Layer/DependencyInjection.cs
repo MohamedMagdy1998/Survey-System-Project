@@ -2,6 +2,7 @@
 using Application.Options;
 using Application.Services_Implementations;
 using Application.Services_Interfaces;
+using Application.Settings;
 using Domain;
 using Domain.Common.Interfaces;
 using Domain.Contracts;
@@ -15,6 +16,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -50,11 +52,16 @@ public static class DependencyInjection
         services.AddScoped<IResultService, ResultService>();
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IEmailSender, EmailService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+
+        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+        services.AddHttpContextAccessor();
+
         #endregion
 
 
@@ -67,7 +74,8 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthenticationConfigurations(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<ApplicationDbContext>();
+             .AddEntityFrameworkStores<ApplicationDbContext>()
+             .AddDefaultTokenProviders();
 
 
         var JwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
@@ -93,6 +101,14 @@ public static class DependencyInjection
                 };
             });
 
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequiredLength = 8;
+
+            //options.SignIn.RequireConfirmedEmail = true;
+            
+            options.User.RequireUniqueEmail = true;
+        });
 
         return services;
 

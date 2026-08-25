@@ -19,8 +19,32 @@ public class AuthController : ControllerBase
     }
 
 
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authService.RegisterAsync(request, cancellationToken);
+
+        return result.IsSuccess ? Ok() : result.Problem();
+    }
+
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authService.ConfirmEmailAsync(request);
+
+        return result.IsSuccess ? Ok() : result.Problem();
+    }
+
+    [HttpPost("resend-confirmation-email")]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authService.ResendConfirmationEmailAsync(request);
+
+        return result.IsSuccess ? Ok() : result.Problem();
+    }
+
+
     [HttpPost("")]
-    
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
