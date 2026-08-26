@@ -1,10 +1,12 @@
-﻿using Application.DTOs.Requests.Polls;
+﻿
+using Application.DTOs.Requests.Polls;
 using Application.DTOs.Responses.Polls;
 using Application.Services_Interfaces;
 using Domain.Common.Abstractions;
 using Domain.Common.Abstractions.Errors;
 using Domain.Contracts;
 using Domain.Models;
+using Hangfire;
 using Mapster;
 using System;
 using System.Collections.Generic;
@@ -14,10 +16,10 @@ using System.Threading.Tasks;
 
 namespace Application.Services_Implementations;
 
-public class PollService(IUnitOfWork unitOfWork) : IPollService
+public class PollService(IUnitOfWork unitOfWork,INotificationService notificationService) : IPollService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
+    private readonly INotificationService _notificationService = notificationService;
     public async Task<Result<IEnumerable<PollResponse>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var polls = await _unitOfWork.Polls.GetAllAsync(cancellationToken);
@@ -119,6 +121,10 @@ public class PollService(IUnitOfWork unitOfWork) : IPollService
         poll.IsPublished = !poll.IsPublished;
         await _unitOfWork.Polls.UpdateAsync(poll, cancellationToken);
         await _unitOfWork.CompleteAsync(cancellationToken);
+
+
+        if (poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+            BackgroundJob.Enqueue(() => _notificationService.SendNewPollsNotification(poll.Id));
 
         return Result.Success();
     }

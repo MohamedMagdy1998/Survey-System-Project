@@ -6,6 +6,7 @@ using Domain.Common.Abstractions;
 using Domain.Common.Abstractions.Errors;
 using Domain.Common.Interfaces;
 using Domain.Models;
+using Hangfire;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -138,7 +139,9 @@ public class AuthService : IAuthService
             }
         );
 
-        await EmailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody);
+        BackgroundJob.Enqueue(() => EmailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody));
+
+        await Task.CompletedTask;
     }
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken)
@@ -186,7 +189,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<Result<AuthResponse>> GetNewTokenAndRefreshTokenAsync(string token, string refreshToken,
-CancellationToken cancellationToken = default)
+    CancellationToken cancellationToken = default)
     {
        
         var userId = _jwtProvider.ValidateToken(token);

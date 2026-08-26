@@ -10,6 +10,7 @@ using Domain.Contracts.Repositories;
 using Domain.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using Infrastructure_Layer;
 using Infrastructure_Layer.Implementations;
 using Mapster;
@@ -53,12 +54,13 @@ public static class DependencyInjection
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-
+        services.AddBackgroundJobsConfig(configuration);
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
         services.AddHttpContextAccessor();
 
@@ -198,6 +200,20 @@ public static class DependencyInjection
                     .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
             )
         );
+        return services;
+    }
+
+    private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,
+       IConfiguration configuration)
+    {
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+
+        services.AddHangfireServer();
+
         return services;
     }
 
