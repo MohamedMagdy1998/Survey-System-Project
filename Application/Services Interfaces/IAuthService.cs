@@ -23,4 +23,8 @@ public interface IAuthService
     CancellationToken cancellationToken = default);
 
     public Task<Result> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
+
+    Task<Result> SendResetPasswordCodeAsync(string email);
+    Task<Result> ResetPasswordAsync(ResetPasswordRequest request);
+
 }
