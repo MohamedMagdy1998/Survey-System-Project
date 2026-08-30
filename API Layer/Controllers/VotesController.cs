@@ -2,6 +2,7 @@
 using Application.DTOs.Requests.Votes;
 using Application.Services_Implementations;
 using Application.Services_Interfaces;
+using Domain.Common.Const;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace API_Layer.Controllers;
 
 [Route("api/polls/{pollId}/vote")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = DefaultRoles.Member)]
 public class VotesController : ControllerBase
 {
     private readonly IQuestionService QuestionService;

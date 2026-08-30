@@ -1,11 +1,8 @@
-﻿using Domain.Models;
+﻿using Domain.Common.Const;
+using Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure_Layer.Configurations;
 
@@ -29,6 +26,26 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
             rt.Property(r => r.RevokedOn)
                 .HasColumnName("RevokedOn");
+
+
+            //Default Data
+
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+            builder.HasData(new ApplicationUser
+            {
+                Id = DefaultUsers.AdminId,
+                FirstName = "Survey Basket",
+                LastName = "Admin",
+                UserName = DefaultUsers.AdminEmail,
+                NormalizedUserName = DefaultUsers.AdminEmail.ToUpper(),
+                Email = DefaultUsers.AdminEmail,
+                NormalizedEmail = DefaultUsers.AdminEmail.ToUpper(),
+                SecurityStamp = DefaultUsers.AdminSecurityStamp,
+                ConcurrencyStamp = DefaultUsers.AdminConcurrencyStamp,
+                EmailConfirmed = true,
+                PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
+            });
         });
     }
 }

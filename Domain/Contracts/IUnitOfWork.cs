@@ -13,5 +13,7 @@ public interface IUnitOfWork : IDisposable
 
     IVoteRepository Votes { get; }
 
+    IRoleRepository Roles { get; }
+
     Task<int> CompleteAsync(CancellationToken cancellationToken = default);
 }

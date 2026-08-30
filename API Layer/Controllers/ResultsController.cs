@@ -1,5 +1,7 @@
 ﻿using API_Layer.Extentions;
+using API_Layer.Filters;
 using Application.Services_Interfaces;
+using Domain.Common.Const;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +10,7 @@ namespace API_Layer.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[HasPermission(Permissions.Results)]
 public class ResultsController(IResultService resultService) : ControllerBase
 {
     [HttpGet("row-data")]

@@ -1,7 +1,9 @@
 ﻿using API_Layer.Extentions;
+using API_Layer.Filters;
 using Application.DTOs.Requests.Polls;
 using Application.DTOs.Responses.Polls;
 using Application.Services_Interfaces;
+using Domain.Common.Const;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +16,8 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     private readonly ILogger<PollsController> _logger = logger;
 
     [HttpGet("")]
+    [HasPermission(Permissions.GetPolls)]
+
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Getting all polls");
@@ -23,6 +27,7 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpGet("current")]
+    [Authorize(Roles = DefaultRoles.Member)]
     public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
      
@@ -32,6 +37,8 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpGet("{id:int}")]
+    [HasPermission(Permissions.GetPolls)]
+
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var poll = await _pollService.GetAsync(id, cancellationToken);
@@ -40,6 +47,7 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpPost("")]
+    [HasPermission(Permissions.AddPolls)]
     public async Task<IActionResult> Add([FromBody] PollRequest request,CancellationToken cancellationToken)
     {
         var newPoll = await _pollService.AddAsync(request, cancellationToken);
@@ -48,6 +56,7 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpPut("{id:int}")]
+    [HasPermission(Permissions.UpdatePolls)]
     public async Task<IActionResult> Update([FromRoute] int id,[FromBody] PollRequest request,CancellationToken cancellationToken)
     {
         var isUpdated = await _pollService.UpdateAsync(id, request, cancellationToken);
@@ -55,6 +64,7 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpDelete("{id:int}")]
+    [HasPermission(Permissions.DeletePolls)]
     public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
     {
         var isDeleted = await _pollService.DeleteAsync(id, cancellationToken);
@@ -63,6 +73,7 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
     }
 
     [HttpPut("{id:int}/togglePublish")]
+    [HasPermission(Permissions.UpdatePolls)]
     public async Task<IActionResult> TogglePublish([FromRoute] int id, CancellationToken cancellationToken)
     {
         var isUpdated = await _pollService.TogglePublishStatusAsync(id, cancellationToken);

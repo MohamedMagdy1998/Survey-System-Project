@@ -1,4 +1,5 @@
-﻿using API_Layer.Middleware;
+﻿using API_Layer.Filters;
+using API_Layer.Middleware;
 using Application.Options;
 using Application.Services_Implementations;
 using Application.Services_Interfaces;
@@ -16,6 +17,7 @@ using Infrastructure_Layer.Implementations;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -47,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IPollRepository, PollRepository>();
         services.AddScoped<IQuestionRespository, QuestionRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
+        services.AddScoped<IRoleRepository,RoleRepository>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IQuestionService, QuestionService>();
@@ -76,9 +79,12 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthenticationConfigurations(this IServiceCollection services,IConfiguration configuration)
     {
-        services.AddIdentity<ApplicationUser, IdentityRole>()
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
              .AddEntityFrameworkStores<ApplicationDbContext>()
              .AddDefaultTokenProviders();
+
+        services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
 
         var JwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();

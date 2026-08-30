@@ -1,4 +1,5 @@
 ﻿using Application.Options;
+using Domain.Common.Const;
 using Domain.Common.Interfaces;
 using Domain.Models;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Infrastructure_Layer.Implementations;
@@ -21,19 +23,19 @@ public class JwtProvider : IJwtProvider
     {
         _options = options.Value;
     }
-    public (string Token, int ExpiresIn) GenerateToken(ApplicationUser user)
-    {
-        Claim[] claims = new []
+   public (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles, IEnumerable<string> permissions)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
-            new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        Claim[] claims = [
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email!),
+            new(JwtRegisteredClaimNames.GivenName, user.FirstName),
+            new(JwtRegisteredClaimNames.FamilyName, user.LastName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(nameof(roles), JsonSerializer.Serialize(roles), JsonClaimValueTypes.JsonArray),
+            new(nameof(permissions), JsonSerializer.Serialize(permissions), JsonClaimValueTypes.JsonArray)
+        ];
 
-        };
-
-        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+    var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
     
         var signingCredentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
 
@@ -86,4 +88,5 @@ public class JwtProvider : IJwtProvider
 
     }
 
+    
 }

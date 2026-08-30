@@ -1,7 +1,9 @@
 ﻿using API_Layer.Extentions;
+using API_Layer.Filters;
 using Application.DTOs.Requests.Questions;
 using Application.Services_Interfaces;
 using Domain.Common.Abstractions.Errors;
+using Domain.Common.Const;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +12,6 @@ namespace API_Layer.Controllers;
 
 [Route("api/polls/{pollId}/[controller]")]
 [ApiController]
-[Authorize]
 public class QuestionsController : ControllerBase
 {
     private readonly IQuestionService QuestionService;
@@ -22,6 +23,8 @@ public class QuestionsController : ControllerBase
 
 
     [HttpGet("")]
+    [HasPermission(Permissions.GetQuestions)]
+
     public async Task<IActionResult> GetAllAsync([FromRoute] int pollId, CancellationToken cancellationToken = default)
     {
         var result = await QuestionService.GetAllAsync(pollId, cancellationToken);
@@ -34,6 +37,8 @@ public class QuestionsController : ControllerBase
 
 
     [HttpGet("{Id}")]
+    [HasPermission(Permissions.GetQuestions)]
+
     public async Task<IActionResult> Get(int pollId, int Id, CancellationToken cancellationToken = default)
     {
         var result = await QuestionService.GetByIdAsync(pollId, Id, cancellationToken);
@@ -44,6 +49,7 @@ public class QuestionsController : ControllerBase
 
 
     [HttpPost]
+    [HasPermission(Permissions.AddQuestions)]
 
     public async Task<IActionResult> Add([FromRoute] int pollId, [FromBody] QuestionRequest request, CancellationToken cancellationToken = default)
     {
@@ -56,6 +62,8 @@ public class QuestionsController : ControllerBase
     }
 
     [HttpPut("")]
+    [HasPermission(Permissions.UpdateQuestions)]
+
     public async Task<IActionResult> Update([FromRoute] int pollId, [FromRoute] int Id, [FromBody] QuestionRequest request, CancellationToken cancellationToken = default)
     {
         var result = await QuestionService.UpdateAsync(pollId, Id, request, cancellationToken);
@@ -65,6 +73,8 @@ public class QuestionsController : ControllerBase
     }
 
     [HttpPatch("{Id}/toggleStatus")]
+    [HasPermission(Permissions.UpdateQuestions)]
+
     public async Task<IActionResult> ToggleStatus([FromRoute] int pollId, [FromRoute] int Id, CancellationToken cancellationToken = default)
     {
         var result = await QuestionService.ToggleStatusAsync(pollId, Id, cancellationToken);

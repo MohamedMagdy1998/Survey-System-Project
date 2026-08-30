@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure_Layer;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,string>
 {
     private readonly IHttpContextAccessor HttpContextAccessor;
 

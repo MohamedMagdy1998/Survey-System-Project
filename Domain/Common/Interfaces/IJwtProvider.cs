@@ -9,7 +9,7 @@ namespace Domain.Common.Interfaces;
 
 public interface IJwtProvider
 {
-    public (string Token,int ExpiresIn) GenerateToken(ApplicationUser user);
+    (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles, IEnumerable<string> permissions);
 
     public string? ValidateToken(string token);
 }
