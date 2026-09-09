@@ -1,5 +1,8 @@
 using Application.Services_Interfaces;
 using Hangfire;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
+
 using Serilog;  
 namespace API_Layer;
 
@@ -55,7 +58,13 @@ public class Program
         app.UseAuthentication();
 
         app.UseAuthorization();
+        app.MapHealthChecks("health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 
+
+
+        });
         app.UseSerilogRequestLogging();
 
         app.MapControllers();

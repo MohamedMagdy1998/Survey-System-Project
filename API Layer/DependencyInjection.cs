@@ -70,6 +70,10 @@ public static class DependencyInjection
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
         services.AddHttpContextAccessor();
 
+        services.AddHealthChecks();
+
+       
+
         #endregion
 
 
