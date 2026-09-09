@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Contracts;
 
-public class RequestFilters
+public record RequestFilters
 {
     private const int MaxPageSize = 50;
     private int _pageSize = 10;
@@ -16,4 +16,9 @@ public class RequestFilters
         get => _pageSize;
         init => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
     }
+    public string? SearchValue { get; init; }
+
+    public string? SortColumn { get; init; }
+
+    public string? SortDirection { get; init; } = "Asc";
 }
