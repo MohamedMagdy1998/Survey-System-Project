@@ -11,6 +11,8 @@ public interface IUnitOfWork : IDisposable
     IPollRepository Polls { get; }
     IQuestionRespository Questions { get; }
 
+    IUserRepository Users { get; }
+
     IVoteRepository Votes { get; }
 
     IRoleRepository Roles { get; }

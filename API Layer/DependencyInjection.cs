@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionRespository, QuestionRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IRoleRepository,RoleRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IQuestionService, QuestionService>();
