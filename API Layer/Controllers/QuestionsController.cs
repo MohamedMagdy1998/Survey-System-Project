@@ -1,5 +1,6 @@
 ﻿using API_Layer.Extentions;
 using API_Layer.Filters;
+using Application.Common.Contracts;
 using Application.DTOs.Requests.Questions;
 using Application.Services_Interfaces;
 using Domain.Common.Abstractions.Errors;
@@ -25,9 +26,9 @@ public class QuestionsController : ControllerBase
     [HttpGet("")]
     [HasPermission(Permissions.GetQuestions)]
 
-    public async Task<IActionResult> GetAllAsync([FromRoute] int pollId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromRoute] int pollId, [FromQuery] RequestFilters filters, CancellationToken cancellationToken = default)
     {
-        var result = await QuestionService.GetAllAsync(pollId, cancellationToken);
+        var result = await QuestionService.GetAllAsync(pollId, filters, cancellationToken);
       
                 if (result.IsFailure)
                    return result.Problem();

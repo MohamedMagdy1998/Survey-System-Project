@@ -1,4 +1,6 @@
-﻿using Application.DTOs.Requests.Questions;
+﻿using Application.Common;
+using Application.Common.Contracts;
+using Application.DTOs.Requests.Questions;
 using Application.DTOs.Responses.Answers;
 using Application.DTOs.Responses.Questions;
 using Application.Services_Interfaces;
@@ -43,19 +45,22 @@ public class QuestionService(IUnitOfWork unitOfWork, ICacheService cacheService)
         return response;
     }
 
-    public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int pollId, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<PaginatedResult<QuestionResponse>>>> GetAllAsync(int pollId, RequestFilters filters, CancellationToken cancellationToken = default)
     {
         var cacheKey = $"{CachePrefix}:poll:{pollId}:all";
 
         var cachedQuestions = await cacheService.GetAsync<List<QuestionResponse>>(cacheKey, cancellationToken);
+        
         if (cachedQuestions is not null)
-            return Result.Success<IEnumerable<QuestionResponse>>(cachedQuestions);
+            return Result.Success<IEnumerable<PaginatedResult<QuestionResponse>>>(new List<PaginatedResult<QuestionResponse>> { new PaginatedResult<QuestionResponse>(cachedQuestions, cachedQuestions.Count, filters.PageNumber, filters.PageSize) });
 
         var pollExists = await unitOfWork.Polls.ExistsAsync(x => x.Id == pollId, cancellationToken);
+        
         if (!pollExists)
             return PollErrors.NotFound;
 
         var questions = await unitOfWork.Questions.GetAllAsync(pollId, cancellationToken);
+       
         if (!questions.Any())
             return QuestionErrors.NotFound;
 
@@ -63,7 +68,7 @@ public class QuestionService(IUnitOfWork unitOfWork, ICacheService cacheService)
 
         await cacheService.SetAsync(cacheKey, response, cancellationToken);
 
-        return Result.Success<IEnumerable<QuestionResponse>>(response);
+        return Result.Success<IEnumerable<PaginatedResult<QuestionResponse>>>(new List<PaginatedResult<QuestionResponse>> { new PaginatedResult<QuestionResponse>(response, response.Count, filters.PageNumber, filters.PageSize) });
     }
 
     public async Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int pollId, string userId, CancellationToken cancellationToken = default)

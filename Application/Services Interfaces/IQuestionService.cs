@@ -1,4 +1,6 @@
-﻿using Application.DTOs.Requests.Questions;
+﻿using Application.Common;
+using Application.Common.Contracts;
+using Application.DTOs.Requests.Questions;
 using Application.DTOs.Responses.Questions;
 using Domain.Common.Abstractions;
 using System;
@@ -14,7 +16,7 @@ public interface IQuestionService
     public Task<Result<QuestionResponse>> AddAsync(int PollId, QuestionRequest request, CancellationToken cancellationToken = default);
 
 
-    public Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int PollId, CancellationToken cancellationToken = default);
+    public Task<Result<IEnumerable<PaginatedResult<QuestionResponse>>>> GetAllAsync(int PollId, RequestFilters filters, CancellationToken cancellationToken = default);
 
     public Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int PollId, string UserId, CancellationToken cancellationToken = default);
 
