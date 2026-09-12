@@ -5,6 +5,7 @@ using Application.Services_Implementations;
 using Application.Services_Interfaces;
 using Application.Settings;
 using Domain;
+using Domain.Common.Const;
 using Domain.Common.Interfaces;
 using Domain.Contracts;
 using Domain.Contracts.Repositories;
@@ -20,11 +21,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog.Core;
 using System.IO.Compression;
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 namespace API_Layer;
 
@@ -42,6 +47,7 @@ public static class DependencyInjection
         services.AddAuthenticationConfigurations(configuration);
         services.AddOptionsPatternConfigurations(configuration);
         services.AddCorsConfigurations(configuration);
+        services.AddRateLimitingConfig(configuration);
         #endregion
 
         #region Services Registeration
@@ -226,6 +232,61 @@ public static class DependencyInjection
             .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
 
         services.AddHangfireServer();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRateLimitingConfig(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var settings = configuration
+            .GetSection(MyRateLimitOptions.MyRateLimit)
+            .Get<MyRateLimitOptions>() ?? new MyRateLimitOptions();
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.OnRejected = async (context, cancellationToken) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "text/plain";
+                    context.HttpContext.Response.Headers.RetryAfter = "60";
+                
+
+                await context.HttpContext.Response.WriteAsync( "Rate limit exceeded. Please try again later.",cancellationToken);
+            };
+
+            options.AddPolicy(RateLimiters.IpLimiter, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
+                    }
+                )
+            );
+
+            options.AddPolicy(RateLimiters.UserLimiter, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.Identity?.Name ?? "Anonymous",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
+                    }
+                )
+            );
+
+            options.AddConcurrencyLimiter(RateLimiters.Concurrency, limiter =>
+            {
+                limiter.PermitLimit = settings.PermitLimit;
+                limiter.QueueLimit = settings.QueueLimit;
+                limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+        });
 
         return services;
     }

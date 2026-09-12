@@ -55,6 +55,8 @@ public class Program
     
         app.UseRouting();
 
+        app.UseRateLimiter();
+
         app.UseAuthentication();
 
         app.UseAuthorization();

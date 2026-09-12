@@ -7,6 +7,7 @@ using Domain.Common.Const;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -28,6 +29,8 @@ public class PollsController(IPollService pollService, ILogger<PollsController> 
 
     [HttpGet("current")]
     [Authorize(Roles = DefaultRoles.Member)]
+    [EnableRateLimiting(RateLimiters.UserLimiter)]
+
     public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
      

@@ -6,6 +6,7 @@ using Domain.Common.Const;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace API_Layer.Controllers;
@@ -13,6 +14,8 @@ namespace API_Layer.Controllers;
 [Route("api/polls/{pollId}/vote")]
 [ApiController]
 [Authorize(Roles = DefaultRoles.Member)]
+[EnableRateLimiting(RateLimiters.Concurrency)]
+
 public class VotesController : ControllerBase
 {
     private readonly IQuestionService QuestionService;
