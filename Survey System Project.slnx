@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="API Layer/API Layer.csproj" />
   <Project Path="Application/Application.csproj" />
+  <Project Path="Domain.UnitTests/Domain.UnitTests.csproj" />
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure Layer/Infrastructure Layer.csproj" />
 </Solution>
