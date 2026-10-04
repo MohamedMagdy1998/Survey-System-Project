@@ -1,4 +1,4 @@
-﻿using Domain.Contracts;
+using Domain.Contracts;
 using Domain.Contracts.Repositories;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
@@ -24,15 +24,16 @@ public class UnitOfWork : IUnitOfWork
 
     private readonly Lazy<IUserRepository> _UserRepository;
 
-    private readonly UserManager<ApplicationUser> _userManager= default!;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
         _PollRepository = new Lazy<IPollRepository>(() => new PollRepository(_context));
         _QuestionRepository = new Lazy<IQuestionRespository>(() => new QuestionRepository(_context));
         _VoteRepository = new Lazy<IVoteRepository>(() => new VoteRepository(_context));
-        _RoleRepository = new Lazy<IRoleRepository>(() => new RoleRepository(_context, _userManager!));
+        _RoleRepository = new Lazy<IRoleRepository>(() => new RoleRepository(_context, _userManager));
         _UserRepository = new Lazy<IUserRepository>(() => new UserRepository(_context));
 
     }

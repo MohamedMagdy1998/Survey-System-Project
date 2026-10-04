@@ -361,3 +361,15 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Environment and Secret configuration
+.env
+.env.local
+!.env.example
+!.env.development
+!.env.testing
+!.env.production
+
+# IDE & AI Assistant metadata
+.agents/
+
