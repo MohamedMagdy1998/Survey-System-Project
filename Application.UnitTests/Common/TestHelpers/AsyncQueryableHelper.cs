@@ -147,7 +147,7 @@ internal class ExpressionTreeRewriter : ExpressionVisitor
                         var asQueryableMethod = typeof(Queryable).GetMethods()
                             .First(m => m.Name == nameof(Queryable.AsQueryable) && m.IsGenericMethod)
                             .MakeGenericMethod(elementType);
-                        var standardQueryable = asQueryableMethod.Invoke(null, new object[] { list });
+                        var standardQueryable = asQueryableMethod.Invoke(null, new object?[] { list });
 
                         return Expression.Constant(standardQueryable);
                     }

@@ -1,4 +1,4 @@
-﻿using Application.Options;
+using Application.Options;
 using Domain.Common.Const;
 using Domain.Common.Interfaces;
 using Domain.Models;
@@ -53,7 +53,7 @@ public class JwtProvider : IJwtProvider
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return (tokenString, ExpiresIn: expiresIn * 60);
+        return (tokenString, expiresIn: expiresIn * 60);
 
 
     }
